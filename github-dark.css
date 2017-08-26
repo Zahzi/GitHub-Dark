@@ -1051,7 +1051,7 @@
     color: #777 !important;
   }
   .private .mini-repo-list-item {
-    background: #221 !important;
+    background: #222 !important;
   }
   /* previously orange border bottom */
   .pagehead ul.tabs li a.selected, .pagehead > ul.tabs li a:hover,
@@ -2740,7 +2740,7 @@
   }
   /* interactive button - bright border */
   .btn-primary:not(.compare-button), .button.primary, .btn-theme-green {
-    background: linear-gradient(#407045, #305530) !important;
+    background: linear-gradient(#00961C, #00991C) !important;
     border-color: #083 !important;
   }
   .button.primary:disabled, .button.primary:disabled:hover,
@@ -2762,7 +2762,7 @@
   }
   .btn-primary:not(:disabled):not(.compare-button):hover,
   .button.primary:not(:disabled):hover, .btn-theme-green:hover {
-    background: linear-gradient(#508055, #407045) !important;
+    background: linear-gradient(#00A111, #00A111) !important;
   }
   /* orange */
   #user-links .unread_count, .minorproblem .pageheader_wrap {
