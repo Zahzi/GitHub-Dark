@@ -12,7 +12,7 @@ There are a number of ways to get involved with the development of this GitHub D
 ## How to Report Style issues
 
 ### I don't know CSS
-If you don't know CSS very well and have found a missing style, please include as much as possible of following information when opening an issue:
+If you don't know CSS very well and have found a missing style, please include as much as possible of the following information when opening an issue:
 
 * Screenshot of the problem; include the element(s) in the console if at all possible
   * To select an element, target it with your mouse then right-click and choose "Inspect Element"
@@ -27,9 +27,9 @@ If you don't know CSS very well and have found a missing style, please include a
 ## GitHub Dark Style Guide
 
 * Use the provided `.editorconfig` file with your code editor. Don't know what that is? Then check out http://editorconfig.org/.
-* Limit to the [K&R Style](http://en.wikipedia.org/wiki/1_true_brace_style#K.26R_style), and **2 SPACE INDENTATION** (no tabs, and not more, and not less than 2 spaces).
+* Limit to the [K&R (KNF variation style)](https://en.wikipedia.org/wiki/Indentation_style#Variant:_BSD_KNF), and **2 SPACE INDENTATION** (no tabs, and not more, and not less than 2 spaces).
 
-  * K&R Example:
+  * K&R - KNF Variation Example:
     ```css
     element[attr='value'] {
     ··property: value;
@@ -77,7 +77,7 @@ If you don't know CSS very well and have found a missing style, please include a
 
 ## Getting Started
 
-* Download, fork or clone this repository.
+* [Download](https://github.com/StylishThemes/GitHub-Dark/archive/master.zip), [fork](https://github.com/StylishThemes/GitHub-Dark/fork) or clone this repository.
 * Use [node.js](http://nodejs.org/) to run `npm install`.
 * Make any changes to the `github-dark.css` file and save.
 
@@ -88,5 +88,5 @@ If you don't know CSS very well and have found a missing style, please include a
 * Copy & paste the css from the newly created `github-dark-{theme}-{color}.build.css` file into the Stylish editor to test your changes.
 * Once you are satisfied with the changes, run `grunt clean` to reindent &amp; clean up the css.
 * Now you can push the changes of the `github-dark.css` file to your fork and submit a pull request.
-* If you haven't already contributed, then also run `npm run authors` to add your name to our list of contributors :smile:
+* If you haven't already contributed, then also run `npx grunt authors` to add your name to our list of contributors :smile:
 * And thanks again for contributing!

@@ -4,19 +4,10 @@ module.exports = function(grunt) {
   "use strict";
 
   let config;
-  const defaults = {
-    theme    : "twilight",
-    themeCM  : "twilight",
-    themeJP  : "twilight",
-    color    : "#4183C4",
-    font     : "Menlo",
-    image    : "url(https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/images/backgrounds/bg-tile1.png)",
-    tiled    : true,
-    codeWrap : false,
-    attach   : "scroll",
-    tab      : 4,
-    webkit   : false
-  };
+  const defaults = require("./defaults.json");
+  const pkg = require("./package.json");
+  defaults.webkit = false;
+  grunt.file.defaultEncoding = "utf8";
 
   try {
     config = Object.assign({}, defaults, grunt.file.readJSON("build.json"));
@@ -42,9 +33,35 @@ module.exports = function(grunt) {
     return data;
   }
 
+  function processJupyterFiles() {
+    const files = grunt.file.expand({
+      filter: "isFile",
+      cwd: "themes/jupyter"
+    }, ["*"]);
+    files.forEach(file => {
+      const theme = grunt.file.read(`themes/jupyter/${file}`);
+      grunt.file.write(`themes/jupyter/${file}`, replaceCSSMatches(theme));
+    });
+  }
+
+  // :any() has been deprecated, and :matches() is not fully supported
+  // this is a simple replace method.. it'll handle `:matches .selector`, but
+  // not `selector :matches()`
+  function replaceCSSMatches(theme) {
+    return theme.replace(/:matches\(([^)]+)\)\s([^,{]+)(,|{)/gm, (_, matches, selector, separator) => {
+      let result = "";
+      const m = matches.split(/\s*,\s*/);
+      const last = m.length - 1;
+      m.forEach((match, index) => {
+        result += `${match} ${selector.trim()}${index >= last && separator === "{" ? " {" : ", "}`;
+      });
+      return result;
+    });
+  }
+
   function getVersion(level) {
     const semver = require("semver");
-    const version = require("./package.json").version;
+    const version = pkg.version;
     return semver.inc(version, level);
   }
 
@@ -138,6 +155,9 @@ module.exports = function(grunt) {
     pattern: "/*[[font-choice]]*/",
     replacement: config.font
   }, {
+    pattern: "/*[[font-size-choice]]*/",
+    replacement: config.fontSize
+  }, {
     pattern: "/*[[code-wrap]]*/",
     replacement: config.codeWrapCss
   }, {
@@ -184,42 +204,11 @@ module.exports = function(grunt) {
   }];
 
   grunt.initConfig({
-    pkg: grunt.file.readJSON("package.json"),
-    config: config,
-
+    pkg, config,
     "string-replace": {
       inline: {
         files: {"<%= config.buildFile %>" : "<%= config.sourceFile %>"},
         options: {replacements: "<%= config.replacements %>"}
-      },
-      // prevent cssmin from removing the AGENT_SHEET comment for Firefox
-      mark: {
-        files: {"<%= config.buildFile %>" : "<%= config.buildFile %>"},
-        options: {
-          replacements: [
-            {pattern: /\/\*\[\[/gm, replacement: "/*![["},
-            {pattern: "/* AGENT_SHEET */", replacement: "/*! AGENT_SHEET */"}
-          ]
-        }
-      },
-      unmark: {
-        files: {"<%= config.buildFile %>" : "<%= config.buildFile %>"},
-        options: {
-          replacements: [
-            {pattern: /\/\*!\[\[/gm, replacement: "/*[["},
-            {pattern: "/*! AGENT_SHEET */", replacement: "/* AGENT_SHEET */"}
-          ]
-        }
-      },
-      // prevent cssmin from removing userstyles.org placeholders
-      fix: {
-        files: {"<%= config.buildFile %>" : "<%= config.buildFile %>"},
-        options: {
-          replacements: [{
-            pattern: /;:\/\*\[\[/gm,
-            replacement: ";/*[["
-          }]
-        }
       },
       // Tweak Perfectionist results
       afterPerfectionist: {
@@ -237,30 +226,21 @@ module.exports = function(grunt) {
               pattern: /(-025A9,|-02662,)/gim,
               replacement: "$&\n                   "
             },
-            {pattern: /\/\*\[\[code-wrap/, replacement: "\n  /*[[code-wrap"}
+            {pattern: /\/\*\[\[code-wrap/, replacement: "/*[[code-wrap"}
           ]
         }
       },
-      patch: {
-        files: {"github-dark.css": "github-dark.css"},
-        options: {replacements: [{
-          pattern: /v[0-9.]+ \(.+\)/,
-          replacement: "v" + getVersion("patch") + " (" + getDate() + ")"
-        }]}
-      },
-      minor: {
-        files: {"github-dark.css": "github-dark.css"},
-        options: {replacements: [{
-          pattern: /v[0-9.]+ \(.+\)/,
-          replacement: "v" + getVersion("minor") + " (" + getDate() + ")"
-        }]}
-      },
-      major: {
-        files: {"github-dark.css": "github-dark.css"},
-        options: {replacements: [{
-          pattern: /v[0-9.]+ \(.+\)/,
-          replacement: "v" + getVersion("major") + " (" + getDate() + ")"
-        }]}
+      newVersion: {
+        files: {
+          "github-dark.css": "github-dark.css",
+          "github-dark-userstyle.build.css": "github-dark-userstyle.build.css"
+        },
+        options: {
+          replacements: [{
+            pattern: /v[0-9.]+ \(.+\)/,
+            replacement: "v<%= config.version %> (" + getDate() + ")"
+          }],
+        }
       }
     },
     clean: {
@@ -274,17 +254,18 @@ module.exports = function(grunt) {
       }
     },
     exec: {
-      stylelint: "npm -s run stylelint",
-      eslint: "npm -s run eslint",
-      eclint: "npm -s run eclint",
+      add: "git add github-dark.css github-dark.user.css",
       authors: "bash tools/authors.sh",
+      eslint: "npx eslint --quiet --color *.js tools/*.js",
+      generate: "node tools/generate",
       imagemin: "bash tools/imagemin.sh",
-      perfectionist: "npm run perfectionist --silent -- github-dark.css github-dark.css --indentSize 2 --maxAtRuleLength 250",
-      add: "git add github-dark.css",
-      patch: "npm version -f patch",
-      minor: "npm version -f minor",
-      major: "npm version -f major",
-      generate: "node tools/generate"
+      patch: "npx ver -p patch",
+      minor: "npx ver -p minor",
+      major: "npx ver -p major",
+      perfectionist: "npx perfectionist github-dark.css github-dark.css --indentSize 2 --maxAtRuleLength 250",
+      stylelint: "npx stylelint github-dark.css themes/src/**/*.css",
+      update: "npx updates -cu && npm install",
+      usercss: "node tools/build-usercss",
     },
     cssmin: {
       minify: {
@@ -294,12 +275,13 @@ module.exports = function(grunt) {
           level: {
             1: {
               specialComments : "all",
+              removeEmpty: false,
             },
             2: {
               all: false,
               mergeMedia: true,
               removeDuplicateMediaBlocks: true,
-              removeDuplicateRules: true,
+              removeDuplicateRules: true
             },
           },
         }
@@ -313,8 +295,12 @@ module.exports = function(grunt) {
           ext : ".min.css"
         }],
         options: {
-          keepSpecialComments: "*",
-          advanced: false
+          level: {
+            2: {
+              all: true,
+              specialComments: "all"
+            }
+          }
         }
       },
       github: {
@@ -326,6 +312,7 @@ module.exports = function(grunt) {
           ext : ".min.css"
         }],
         options: {
+          // Don't use level 2; background *must* be the first entry; see #599
           keepSpecialComments: "*",
           advanced: false
         }
@@ -339,8 +326,12 @@ module.exports = function(grunt) {
           ext : ".min.css"
         }],
         options: {
-          keepSpecialComments: "*",
-          advanced: false
+          level: {
+            2: {
+              all: true,
+              specialComments: "all"
+            }
+          }
         }
       }
     },
@@ -348,17 +339,13 @@ module.exports = function(grunt) {
       mozrule: {
         files: {"<%= config.buildFile %>" : "<%= config.buildFile %>"},
         options: {
-          wrapper: ["<%= config.prefix %>", "}"]
+          wrapper: ["<%= config.prefix %>", "}\n"]
         }
       }
-    },
-    watch: {
-      css: {files: ["github-dark.css"]}
     }
   });
 
   grunt.loadNpmTasks("grunt-string-replace");
-  grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-cssmin");
   grunt.loadNpmTasks("grunt-wrap");
@@ -381,26 +368,14 @@ module.exports = function(grunt) {
     }
   });
 
-  // build userstyle for pasting into
-  // https://userstyles.org/styles/37035/github-dark
-  grunt.registerTask("user", "building userstyles.org file", () => {
+  // build usercss
+  grunt.registerTask("usercss", "building usercss file", () => {
     config.buildFile = "github-dark-userstyle.build.css";
     config.replacements = config.replacements_user;
     grunt.task.run([
       "string-replace:inline",
-      "wrap"
-    ]);
-  });
-  grunt.registerTask("usermin", "building userstyles.org file", () => {
-    config.buildFile = "github-dark-userstyle.build.css";
-    config.replacements = config.replacements_user;
-    grunt.task.run([
-      "string-replace:inline",
-      "string-replace:mark",
-      "cssmin:minify",
-      "string-replace:unmark",
-      "string-replace:fix",
-      "wrap"
+      "wrap",
+      "exec:usercss"
     ]);
   });
 
@@ -410,13 +385,17 @@ module.exports = function(grunt) {
       "clean:cssmins",
       "cssmin:codemirror",
       "cssmin:github",
-      "cssmin:jupyter"
+      "cssmin:jupyter",
+      "jupyter"
     ]);
+  });
+
+  grunt.registerTask("jupyter", "Replacing :matches() in Jupyter files", () => {
+    processJupyterFiles();
   });
 
   grunt.registerTask("clean", "Perfectionist cleanup", () => {
     grunt.task.run([
-      "exec:stylelint", // check linting first
       "exec:perfectionist",
       "string-replace:afterPerfectionist"
     ]);
@@ -426,8 +405,7 @@ module.exports = function(grunt) {
   grunt.registerTask("lint", "Lint CSS and JS scripts for errors", () => {
     grunt.task.run([
       "exec:eslint",
-      "exec:stylelint",
-      "exec:eclint"
+      "exec:stylelint"
     ]);
   });
 
@@ -443,38 +421,43 @@ module.exports = function(grunt) {
 
   // Auto-generate styles based on GitHub's CSS
   grunt.registerTask("generate", "Auto-generate styles based on GitHub's CSS", () => {
-    grunt.task.run(["exec:generate"]);
+    grunt.task.run(["exec:generate", "clean"]);
+  });
+
+  // Auto-generate styles based on GitHub's CSS
+  grunt.registerTask("update", "Update dependencies", () => {
+    grunt.task.run(["exec:update"]);
   });
 
   // version bump tasks
   grunt.registerTask("patch", "Bump patch version", () => {
+    config.version = getVersion("patch");
     grunt.task.run([
       "lint",
-      "string-replace:patch",
+      "string-replace:newVersion",
+      "usercss",
       "exec:add",
-      "exec:patch",
-      "user"
+      "exec:patch"
     ]);
   });
   grunt.registerTask("minor", "Bump minor version", () => {
+    config.version = getVersion("minor");
     grunt.task.run([
       "lint",
-      "string-replace:minor",
+      "string-replace:newVersion",
+      "usercss",
       "exec:add",
-      "exec:minor",
-      "user"
+      "exec:minor"
     ]);
   });
   grunt.registerTask("major", "Bump major version", () => {
+    config.version = getVersion("major");
     grunt.task.run([
       "lint",
-      "string-replace:major",
+      "string-replace:newVersion",
+      "usercss",
       "exec:add",
-      "exec:major",
-      "user"
+      "exec:major"
     ]);
   });
-
-  // watch thingy
-  grunt.registerTask("dev", ["watch"]);
 };
