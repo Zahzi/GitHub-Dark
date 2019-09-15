@@ -1,12 +1,9 @@
 /*! GitHub: One Dark */
 /* adapted from: https://github.com/atom/one-dark-syntax & https://github.com/Aerobird98/codemirror-one-dark-theme */
 /* by https://github.com/sparcut */
-.highlight, .CodeMirror {
-  background: #141414 !important;
-  color: hsl(220,14%,71%) !important;
-}
-.blob-code, .blob-code-inner {
-  color: hsl(220,14%,71%) !important;
+:root {
+  --ghd-code-background: hsl(0, 0%, 8%);
+  --ghd-code-color: hsl(220,14%,71%);
 }
 /* comment, punctuation.definition.comment, string.comment */
 .pl-c, .pl-c span { color: hsl(220,10%,40%) !important; font-style: italic !important; }
@@ -19,7 +16,7 @@ support, meta.property-name, support.constant, support.variable,
 .pl-cn { color: hsl(29,54%,61%) !important; }
 .pl-e { color: hsl(29,54%,61%) !important; } /* entity */
 .pl-ef { color: hsl(207,82%,66%) !important; } /* entity.function */
-.pl-en { color: hsl(207,82%,66%) !important; } /* entity.name */
+.pl-en { color: hsl(29,54%,61%) !important; } /* entity.name */
 .pl-enc { color: hsl(39,67%,69%) !important; } /* entity.name.class */
 .pl-enf { color: hsl(207,82%,66%) !important; } /* entity.name.function */
 .pl-enm { color: hsl(220,14%,71%) !important; } /* entity.name.method-name */
@@ -58,7 +55,7 @@ support, meta.property-name, support.constant, support.variable,
 .pl-pdc { color: hsl(220,10%,40%) !important; font-style: italic !important; }
 .pl-pdc1 { color: hsl(220,14%,71%) !important; } /* punctuation.definition.constant */
 .pl-pde { color: hsl(286,60%,67%) !important; } /* punctuation.definition.entity */
- /* punctuation.definition.italic */
+/* punctuation.definition.italic */
 .pl-pdi { color: hsl(286,60%,67%) !important; font-style: italic !important; }
 /* punctuation.definition.string, source.regexp, string.regexp.character-class */
 .pl-pds { color: hsl(95,38%,62%) !important; }
@@ -110,13 +107,12 @@ support, meta.property-name, support.constant, support.variable,
 /* constant.other.reference.link, string.other.link */
 .pl-corl { color: hsl(355,65%,65%) !important; text-decoration: underline !important; }
 .pl-ib { background-color: hsl(355,65%,65%) !important; } /* invalid.broken */
-/* invalid.deprecated */
-.pl-id { background-color: hsl(40,60%,20%) !important; color: hsl(40,60%,70%) !important; }
-.pl-ii { background-color: hsl(40,60%,70%) !important; color: #fff !important; } /* invalid.illegal */
-.pl-iu { background-color: hsl(0,70%,60%) !important; } /* invalid.unimplemented */
+.pl-bu, /* invalid.broken, invalid.deprecated, invalid.unimplemented, message.error, brackethighlighter.unmatched, sublimelinter.mark.error */
+.pl-ii { background-color: hsl(0,70%,60%) !important; } /* invalid.illegal */
 .pl-mo { color: hsl(220,14%,71%) !important; } /* meta.output */
 .pl-mri { color: hsl(95,38%,62%) !important; } /* markup.raw.inline */
 .pl-ms1 { color: hsl(220,14%,71%) !important; background-color: #373b41 !important; } /* meta.separator */
 .pl-va { color: hsl(220,14%,71%) !important; } /* variable.assignment */
 .pl-vpu { color: hsl(220,14%,71%) !important; } /* variable.parameter.url */
 .pl-entl { color: hsl(355,65%,65%) !important; } /* entity.name.tag.label */
+.pl-token.active, .pl-token:hover { background: hsl(207,82%,66%) !important; color: hsl(0, 0%, 8%) !important; }

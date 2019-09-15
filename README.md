@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/github/tag/StylishThemes/GitHub-Dark.svg?label=version&style=flat" alt="Version">
   </a>
   <a href="https://github.com/StylishThemes/GitHub-Dark/stargazers">
-    <img src="http://github-svg-buttons.herokuapp.com/star.svg?user=StylishThemes&repo=GitHub-Dark&style=flat&background=007ec6" alt="Stars">
+    <img src="https://img.shields.io/github/stars/StylishThemes/GitHub-Dark.svg?style=flat" alt="Stars">
   </a>
   <a href="https://github.com/StylishThemes/GitHub-Dark/network">
     <img src="https://img.shields.io/github/forks/StylishThemes/GitHub-Dark.svg?style=flat" alt="Forks">
@@ -24,10 +24,10 @@
 
 ## Installation
 
-Install [Stylus](https://add0n.com/stylus.html) for either [Firefox](https://addons.mozilla.org/en-US/firefox/addon/styl-us/), [Chrome](https://chrome.google.com/webstore/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne) or [Opera](https://addons.opera.com/en-gb/extensions/details/stylus/) and then install the style using one of these methods:
+Install [Stylus](https://add0n.com/stylus.html) for either [Firefox](https://addons.mozilla.org/en-US/firefox/addon/styl-us/), [Chrome](https://chrome.google.com/webstore/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne) or [Opera](https://addons.opera.com/en-gb/extensions/details/stylus/) or [Cascadea for Safari](https://cascadea.app/) and then install using one of these methods:
 
 📦 [Install the usercss](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/github-dark.user.css) which supports automatic updates and customization.<br>
-📦 [Install GitHub-Dark Script](https://stylishthemes.github.io/GitHub-Dark-Script/github-dark-script.user.js) which supports automatic updates and customization. Refer to its [README](https://github.com/StylishThemes/GitHub-Dark-Script/blob/master/README.md).<br>
+📦 [Install GitHub-Dark Script](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js) which supports automatic updates and customization. Refer to its [README](https://github.com/StylishThemes/GitHub-Dark-Script/blob/master/README.md).<br>
 📦 [Install manually from GitHub](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/github-dark.css) with no customization, but useful for development. The style is in Mozilla format.<br>
 📦 [Install via custom build](https://github.com/StylishThemes/GitHub-Dark/wiki/Build) with customization from configuration file. Refer to [this wiki page](https://github.com/StylishThemes/GitHub-Dark/wiki/Install).
 
@@ -54,7 +54,8 @@ Install [Stylus](https://add0n.com/stylus.html) for either [Firefox](https://add
 💾 [Octotree](https://github.com/buunguyen/octotree/#octotree)<br>
 💾 [OctoLinker](https://github.com/OctoLinker/OctoLinker)<br>
 💾 [Refined GitHub](https://github.com/sindresorhus/refined-github)<br>
-💾 [ZenHub](https://www.zenhub.io/)
+💾 [ZenHub](https://www.zenhub.io/)<br>
+💾 [GitHub Hovercard](https://github.com/Justineo/github-hovercard) (set it to dark theme)<br>
 
 ## Available Syntax Highlighting Themes ([Demo](https://stylishthemes.github.io/GitHub-Dark/))
 
@@ -79,6 +80,7 @@ Install [Stylus](https://add0n.com/stylus.html) for either [Firefox](https://add
 | Obsidian                   |      ✔️     |      ❌     |      ✔️      |
 | One Dark                   |      ✔️     |      ✔️     |      ❌      |
 | Pastel on Dark             |      ✔️     |      ✔️     |      ✔️      |
+| Railscasts                 |      ✔️     |      ✔️     |      ✔️      |
 | Solarized Dark             |      ✔️     |      ✔️     |      ✔️      |
 | Terminal                   |      ✔️     |      ❌     |      ❌      |
 | Tomorrow Night             |      ✔️     |      ❌     |      ✔️      |
@@ -107,7 +109,7 @@ If you would like to contribute to this repository, please...
 
 ## Development
 
-To develop, first install [Node.js](https://nodejs.org), install dependencies via `npm install` after which you can use the various grunt tasks available:
+To develop, first install [Node.js](https://nodejs.org) 12 or greater, then install dependencies via `npm install` after which you can use the various grunt tasks available:
 
 - `npx grunt`: The default task builds a custom theme using a provided `build.json` file. See the [wiki](https://github.com/StylishThemes/GitHub-Dark/wiki/Build) for details.
 - `npx grunt min`: Same as `grunt`, but outputs a minified style.

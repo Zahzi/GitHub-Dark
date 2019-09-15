@@ -1,5 +1,3 @@
-/* global module, console */
-/* jshint esnext:true, unused:true */
 module.exports = function(grunt) {
   "use strict";
 
@@ -47,8 +45,10 @@ module.exports = function(grunt) {
   // :any() has been deprecated, and :matches() is not fully supported
   // this is a simple replace method.. it'll handle `:matches .selector`, but
   // not `selector :matches()`
+  // `:matches()` renamed to `:is()`
+  // see https://developer.mozilla.org/en-US/docs/Web/CSS/:is
   function replaceCSSMatches(theme) {
-    return theme.replace(/:matches\(([^)]+)\)\s([^,{]+)(,|{)/gm, (_, matches, selector, separator) => {
+    return theme.replace(/:is\(([^)]+)\)\s([^,{]+)(,|{)/gm, (_, matches, selector, separator) => {
       let result = "";
       const m = matches.split(/\s*,\s*/);
       const last = m.length - 1;
@@ -57,16 +57,6 @@ module.exports = function(grunt) {
       });
       return result;
     });
-  }
-
-  function getVersion(level) {
-    const semver = require("semver");
-    const version = pkg.version;
-    return semver.inc(version, level);
-  }
-
-  function getDate() {
-    return (new Date()).toISOString().substring(0, 10);
   }
 
   // modified from http://stackoverflow.com/a/5624139/145346
@@ -165,7 +155,7 @@ module.exports = function(grunt) {
     replacement: config.tab
   }, {
     // remove default syntax themes AND closing bracket
-    pattern: /\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m,
+    pattern: /\s+\/\* grunt build - remove start[\s\S]+grunt build - remove end \*\/$/m,
     replacement: ""
   }, {
     // add selected theme
@@ -199,7 +189,7 @@ module.exports = function(grunt) {
     replacement: "/*[[tab-size]]*/"
   }, {
     // remove default syntax theme AND closing bracket
-    pattern: /\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m,
+    pattern: /\s+\/\* grunt build - remove start[\s\S]+grunt build - remove end \*\/$/m,
     replacement: ""
   }];
 
@@ -207,12 +197,12 @@ module.exports = function(grunt) {
     pkg, config,
     "string-replace": {
       inline: {
-        files: {"<%= config.buildFile %>" : "<%= config.sourceFile %>"},
+        files: {"<%= config.buildFile %>": "<%= config.sourceFile %>"},
         options: {replacements: "<%= config.replacements %>"}
       },
       // Tweak Perfectionist results
       afterPerfectionist: {
-        files: {"<%= config.sourceFile %>" : "<%= config.sourceFile %>"},
+        files: {"<%= config.sourceFile %>": "<%= config.sourceFile %>"},
         options: {
           replacements: [
             {pattern: /\{\/\*!/g, replacement: "{\n /*!"},
@@ -226,20 +216,9 @@ module.exports = function(grunt) {
               pattern: /(-025A9,|-02662,)/gim,
               replacement: "$&\n                   "
             },
-            {pattern: /\/\*\[\[code-wrap/, replacement: "/*[[code-wrap"}
+            {pattern: /\/\*\[\[code-wrap/, replacement: "/*[[code-wrap"},
+            {pattern: /,\u0020{2,}/g, replacement: ", "},
           ]
-        }
-      },
-      newVersion: {
-        files: {
-          "github-dark.css": "github-dark.css",
-          "github-dark-userstyle.build.css": "github-dark-userstyle.build.css"
-        },
-        options: {
-          replacements: [{
-            pattern: /v[0-9.]+ \(.+\)/,
-            replacement: "v<%= config.version %> (" + getDate() + ")"
-          }],
         }
       }
     },
@@ -254,14 +233,13 @@ module.exports = function(grunt) {
       }
     },
     exec: {
-      add: "git add github-dark.css github-dark.user.css",
       authors: "bash tools/authors.sh",
       eslint: "npx eslint --quiet --color *.js tools/*.js",
       generate: "node tools/generate",
       imagemin: "bash tools/imagemin.sh",
-      patch: "npx ver -p patch",
-      minor: "npx ver -p minor",
-      major: "npx ver -p major",
+      patch: "npx ver -p -d patch github-dark.css github-dark.user.css",
+      minor: "npx ver -p -d minor github-dark.css github-dark.user.css",
+      major: "npx ver -p -d major github-dark.css github-dark.user.css",
       perfectionist: "npx perfectionist github-dark.css github-dark.css --indentSize 2 --maxAtRuleLength 250",
       stylelint: "npx stylelint github-dark.css themes/src/**/*.css",
       update: "npx updates -cu && npm install",
@@ -269,12 +247,12 @@ module.exports = function(grunt) {
     },
     cssmin: {
       minify: {
-        files: {"<%= config.buildFile %>" : "<%= config.buildFile %>"},
+        files: {"<%= config.buildFile %>": "<%= config.buildFile %>"},
         options: {
           rebase: false,
           level: {
             1: {
-              specialComments : "all",
+              specialComments: "all",
               removeEmpty: false,
             },
             2: {
@@ -288,11 +266,11 @@ module.exports = function(grunt) {
       },
       codemirror: {
         files: [{
-          expand : true,
-          cwd : "themes/src/codemirror/",
-          src : "*.css",
-          dest : "themes/codemirror",
-          ext : ".min.css"
+          expand: true,
+          cwd: "themes/src/codemirror/",
+          src: "*.css",
+          dest: "themes/codemirror",
+          ext: ".min.css"
         }],
         options: {
           level: {
@@ -305,11 +283,11 @@ module.exports = function(grunt) {
       },
       github: {
         files: [{
-          expand : true,
-          cwd : "themes/src/github/",
-          src : "*.css",
-          dest : "themes/github",
-          ext : ".min.css"
+          expand: true,
+          cwd: "themes/src/github/",
+          src: "*.css",
+          dest: "themes/github",
+          ext: ".min.css"
         }],
         options: {
           // Don't use level 2; background *must* be the first entry; see #599
@@ -319,11 +297,11 @@ module.exports = function(grunt) {
       },
       jupyter: {
         files: [{
-          expand : true,
-          cwd : "themes/src/jupyter/",
-          src : "*.css",
-          dest : "themes/jupyter",
-          ext : ".min.css"
+          expand: true,
+          cwd: "themes/src/jupyter/",
+          src: "*.css",
+          dest: "themes/jupyter",
+          ext: ".min.css"
         }],
         options: {
           level: {
@@ -337,9 +315,9 @@ module.exports = function(grunt) {
     },
     wrap: {
       mozrule: {
-        files: {"<%= config.buildFile %>" : "<%= config.buildFile %>"},
+        files: {"<%= config.buildFile %>": "<%= config.buildFile %>"},
         options: {
-          wrapper: ["<%= config.prefix %>", "}\n"]
+          wrapper: ["<%= config.prefix %>", ""]
         }
       }
     }
@@ -390,7 +368,7 @@ module.exports = function(grunt) {
     ]);
   });
 
-  grunt.registerTask("jupyter", "Replacing :matches() in Jupyter files", () => {
+  grunt.registerTask("jupyter", "Replacing :is() in Jupyter files", () => {
     processJupyterFiles();
   });
 
@@ -431,32 +409,23 @@ module.exports = function(grunt) {
 
   // version bump tasks
   grunt.registerTask("patch", "Bump patch version", () => {
-    config.version = getVersion("patch");
     grunt.task.run([
       "lint",
-      "string-replace:newVersion",
       "usercss",
-      "exec:add",
       "exec:patch"
     ]);
   });
   grunt.registerTask("minor", "Bump minor version", () => {
-    config.version = getVersion("minor");
     grunt.task.run([
       "lint",
-      "string-replace:newVersion",
       "usercss",
-      "exec:add",
       "exec:minor"
     ]);
   });
   grunt.registerTask("major", "Bump major version", () => {
-    config.version = getVersion("major");
     grunt.task.run([
       "lint",
-      "string-replace:newVersion",
       "usercss",
-      "exec:add",
       "exec:major"
     ]);
   });
